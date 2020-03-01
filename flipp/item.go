@@ -8,8 +8,9 @@ const (
 
 type Item struct {
 	ID             int64     `json:"id"`
-	FlyerItemID    int64     `json:"flyer_item_id"`
 	FlyerID        int       `json:"flyer_id"`
+	PrintID        int64     `json:"print_id,stringo"`
+	FlyerItemID    int64     `json:"flyer_item_id"`
 	Name           string    `json:"name"`
 	CurrentPrice   float64   `json:"current_price,string,omitempty"`
 	ValidTo        time.Time `json:"valid_to"`
