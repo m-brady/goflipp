@@ -18,6 +18,15 @@ func (m *MerchantService) GetAll() ([]*Merchant, error) {
 	return resp.Result().([]*Merchant), nil
 }
 
+func (f *Client) Merchants() []*Merchant {
+
+	get, err := f.client.R().SetResult(Response{}).Get(merchants)
+	if err != nil {
+		panic(err)
+	}
+	return get.Result().(*Response).Merchants
+}
+
 type Merchant struct {
 	ID             int    `json:"id"`
 	Name           string `json:"name"`
