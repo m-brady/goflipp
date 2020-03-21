@@ -59,7 +59,6 @@ func Search(params SearchParams) (*Response, error) {
 	req.URL.Path = req.URL.Path + search
 	q := req.URL.Query()
 	q.Add("q", params.Query)
-	q.Add("locale", params.Locale)
 	q.Add("postal_code", params.PostalCode)
 	q.Add("merchant", strings.Join(params.Merchants, ","))
 	req.URL.RawQuery = q.Encode()
@@ -86,11 +85,6 @@ func GetItem(params ItemParams) (*Response, error) {
 	}
 
 	req.URL.Path = req.URL.Path + fmt.Sprintf(item, params.ItemID)
-	q := req.URL.Query()
-	q.Add("locale", params.Locale)
-	q.Add("postal_code", params.PostalCode)
-
-	req.URL.RawQuery = q.Encode()
 
 	resp, err := flippClient.Do(req)
 	if err != nil {

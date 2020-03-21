@@ -11,7 +11,6 @@ const (
 )
 
 type Params struct {
-	Locale     string
 	PostalCode string
 }
 

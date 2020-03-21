@@ -34,7 +34,6 @@ func Flyers(params FlyerParams) (*Response, error) {
 	req.URL.Path = req.URL.Path + fmt.Sprintf(flyers, params.FlyerID)
 
 	q := req.URL.Query()
-	q.Add("locale", params.Locale)
 	q.Add("postal_code", params.PostalCode)
 	req.URL.RawQuery = q.Encode()
 
