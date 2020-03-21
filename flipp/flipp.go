@@ -1,14 +1,19 @@
 package flipp
 
 import (
-	"github.com/go-resty/resty/v2"
 	"net/http"
+	"time"
 )
 
 // API constants
 const (
 	host = "https://gateflipp.flippback.com/bf/flipp"
 )
+
+type Params struct {
+	Locale     string
+	PostalCode string
+}
 
 type Response struct {
 	RefreshedAt string         `json:"refreshed_at,omitempty"`
@@ -18,23 +23,4 @@ type Response struct {
 	Item        *Item          `json:"item,omitempty"`
 }
 
-type Config struct {
-	Locale     string
-	PostalCode string
-}
-
-func New(config *Config) *Client {
-	return &Client{client: resty.New().SetHostURL(host).
-		SetQueryParam("locale", config.Locale).
-		SetQueryParam("postal_code", config.PostalCode)}
-}
-
-func NewWithClient(config *Config, hc *http.Client) *Client {
-	return &Client{client: resty.NewWithClient(hc).SetHostURL(host).
-		SetQueryParam("locale", config.Locale).
-		SetQueryParam("postal_code", config.PostalCode)}
-}
-
-type Client struct {
-	client *resty.Client
-}
+var flippClient = http.Client{Timeout: 30 * time.Second}

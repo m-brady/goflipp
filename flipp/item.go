@@ -1,17 +1,30 @@
 package flipp
 
 import (
+	"encoding/json"
 	"fmt"
-	"strconv"
+	"net/http"
 	"strings"
 	"time"
 )
 
 const (
-	item   = "/items/%d"
 	search = "/items/search"
+	item   = "/items/%d"
 )
 
+type SearchParams struct {
+	Params
+	Query     string
+	Merchants []string
+}
+
+type ItemParams struct {
+	Params
+	ItemID int64
+}
+
+// ItemDetails encapsulates data received from flipp search
 type ItemDetails struct {
 	FlyerItemID      int64     `json:"flyer_item_id"`
 	FlyerID          int       `json:"flyer_id"`
@@ -23,6 +36,7 @@ type ItemDetails struct {
 	MerchantID       int       `json:"merchant_id"`
 }
 
+// Item encapsulates data received from flipp item endpoint
 type Item struct {
 	ID             int64     `json:"id"`
 	FlyerID        int       `json:"flyer_id"`
@@ -35,25 +49,58 @@ type Item struct {
 	CutoutImageURL string    `json:"cutout_image_url"`
 }
 
-func (f *Client) Search(query string, merchants ...int) ([]*ItemDetails, error) {
-	var ms []string
-	for _, m := range merchants {
-		ms = append(ms, strconv.Itoa(m))
-	}
-
-	response, err := f.client.R().SetResult(Response{}).SetQueryParam("q", query).SetQueryParam("merchant", strings.Join(ms, ",")).Get(search)
+// Search flipp given the search parameters using default client
+func Search(params SearchParams) (*Response, error) {
+	req, err := http.NewRequest(http.MethodGet, host, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	return response.Result().(*Response).ItemDetails, nil
+	req.URL.Path = req.URL.Path + search
+	q := req.URL.Query()
+	q.Add("q", params.Query)
+	q.Add("locale", params.Locale)
+	q.Add("postal_code", params.PostalCode)
+	q.Add("merchant", strings.Join(params.Merchants, ","))
+	req.URL.RawQuery = q.Encode()
+
+	resp, err := flippClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	decoder := json.NewDecoder(resp.Body)
+	r := Response{}
+	err = decoder.Decode(&r)
+	if err != nil {
+		return nil, err
+	}
+	fmt.Println(resp)
+	return &r, nil
 }
 
-func (f *Client) Item(itemID int64) (*Item, error) {
-
-	get, err := f.client.R().SetResult(Response{}).Get(fmt.Sprintf(item, itemID))
+// GetItem returns a new item
+func GetItem(params ItemParams) (*Response, error) {
+	req, err := http.NewRequest(http.MethodGet, host, nil)
 	if err != nil {
 		return nil, err
 	}
-	return get.Result().(*Response).Item, nil
+
+	req.URL.Path = req.URL.Path + fmt.Sprintf(item, params.ItemID)
+	q := req.URL.Query()
+	q.Add("locale", params.Locale)
+	q.Add("postal_code", params.PostalCode)
+
+	req.URL.RawQuery = q.Encode()
+
+	resp, err := flippClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	decoder := json.NewDecoder(resp.Body)
+	r := Response{}
+	err = decoder.Decode(&r)
+	if err != nil {
+		return nil, err
+	}
+	return &r, nil
 }
