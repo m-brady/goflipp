@@ -20,7 +20,6 @@ type SearchParams struct {
 }
 
 type ItemParams struct {
-	Params
 	ItemID int64
 }
 
