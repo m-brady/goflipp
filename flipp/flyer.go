@@ -20,7 +20,6 @@ type Flyer struct {
 }
 
 type FlyerParams struct {
-	Params
 	FlyerID int
 }
 
@@ -32,10 +31,6 @@ func Flyers(params FlyerParams) (*Response, error) {
 	}
 
 	req.URL.Path = req.URL.Path + fmt.Sprintf(flyers, params.FlyerID)
-
-	q := req.URL.Query()
-	q.Add("postal_code", params.PostalCode)
-	req.URL.RawQuery = q.Encode()
 
 	resp, err := flippClient.Do(req)
 	if err != nil {

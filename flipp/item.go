@@ -14,9 +14,9 @@ const (
 )
 
 type SearchParams struct {
-	Params
-	Query     string
-	Merchants []string
+	PostalCode string
+	Query      string
+	Merchants  []string
 }
 
 type ItemParams struct {
