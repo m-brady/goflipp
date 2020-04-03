@@ -72,7 +72,6 @@ func Search(params SearchParams) (*Response, error) {
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(resp)
 	return &r, nil
 }
 
